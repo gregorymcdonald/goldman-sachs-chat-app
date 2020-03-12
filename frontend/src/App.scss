@@ -1,0 +1,14 @@
+html, body, #root, #root > div {
+    height: 100%
+}
+
+body {
+    color: rgb(32, 33, 36);
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    margin: 0;
+}
+
+div.container {
+    display: flex;
+    flex-direction: row;
+}
