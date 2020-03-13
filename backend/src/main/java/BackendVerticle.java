@@ -1,54 +1,21 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.Future;
 import io.vertx.core.json.*;
-import io.vertx.core.Vertx;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.Route;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.StaticHandler;
-import io.vertx.ext.web.handler.CorsHandler;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.ServerWebSocket;
 
 public class BackendVerticle extends AbstractVerticle {
     private List<TextMessage> messages = new ArrayList<TextMessage>();
 
     @Override
     public void start(Future<Void> startFuture) {
-        // // Set up the routes used by our application.
-        // Router router = Router.router(vertx);
-        // // Enable CORS for the frontend.
-        // router.route().handler(
-        //     CorsHandler.create("http://localhost:1234")  
-        //         .allowedMethod(HttpMethod.GET)
-        //         .allowedMethod(HttpMethod.POST)
-        //         .allowedMethod(HttpMethod.OPTIONS)
-        //         .allowCredentials(true)
-        //         .allowedHeader("Access-Control-Allow-Method")
-        //         .allowedHeader("Access-Control-Allow-Origin")
-        //         .allowedHeader("Access-Control-Allow-Credentials")
-        //         .allowedHeader("Content-Type")); 
-        // // Configures a custom error handler (default behavior swallows errors).
-        // router.errorHandler(500, routingContext -> {
-        //     Object failure = routingContext.failure();
-        //     if (failure instanceof Exception) {
-        //         Exception exception = (Exception) failure;
-        //         exception.printStackTrace();
-        //         routingContext.response().end(exception.getMessage());
-        //     } else {
-        //         System.err.println(failure);
-        //     }
-        // });
-
         vertx
             .createHttpServer()
             .websocketHandler(this::websocketHandler)
-            //.requestHandler(router)
               .listen(8080, result -> {
                   if (result.succeeded()) {
                     startFuture.complete();
@@ -59,8 +26,13 @@ public class BackendVerticle extends AbstractVerticle {
     }
 
     private void websocketHandler(ServerWebSocket webSocket) {
-        // When the connection is first established, have the server write all messages.
+        // When the connection is first established, have the server write all previous messages.
         webSocket.writeTextMessage(Json.encodePrettily(messages));
+
+        // Register this WebSocket connection as a consumer for the event bus address "messages".
+        vertx.eventBus().consumer("messages", (Message<Object> message) -> {
+            webSocket.writeTextMessage((String)message.body());
+        });
 
         // Called each time the server receives a message.
         webSocket.handler(
@@ -68,10 +40,12 @@ public class BackendVerticle extends AbstractVerticle {
                 try {
                     // Decode the message and save it.
                     JsonObject textMessageJson = (JsonObject) Json.decodeValue(data);
-                    System.out.println("Received " + textMessageJson.toString());
                     TextMessage textMessage = new TextMessage(textMessageJson.getString("name"), textMessageJson.getString("message"));
                     messages.add(textMessage);
-                    webSocket.writeTextMessage(Json.encodePrettily(messages));
+
+                    // Write the new messages to the event bus address "messages".
+                    // The entire message history is broadcast each time. This allows clients after this connection to see old messages.
+                    vertx.eventBus().publish("messages", Json.encodePrettily(messages));
                 } catch (Exception e) {
                     System.err.println("Error occured processing message, shown below:");
                     e.printStackTrace();

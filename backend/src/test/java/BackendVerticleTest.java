@@ -52,8 +52,7 @@ public class BackendVerticleTest {
 
         vertx.createHttpClient().websocket(8080, "localhost", "",
             (WebSocket webSocket) -> {
-                TextMessage textMessage = new TextMessage("Gregory", "Hello World!");               
-                webSocket.writeTextMessage(Json.encodePrettily(textMessage));
+                TextMessage textMessage = new TextMessage("Gregory", "Hello World!");
                 webSocket.handler(
                     (Buffer buffer) -> {
                         try {
@@ -62,14 +61,14 @@ public class BackendVerticleTest {
                                 JsonObject firstMessage = messages.getJsonObject(0);
                                 context.assertEquals(textMessage.getName(), firstMessage.getString("name"));
                                 context.assertEquals(textMessage.getMessage(), firstMessage.getString("message"));
+                                async.complete();
                             }
                         } catch(Exception e) {
                             context.fail(e);
-                        } finally {
-                            async.complete();
                         }
                     }
-                );
+                );               
+                webSocket.writeTextMessage(Json.encodePrettily(textMessage));       
         });
     }
 }
