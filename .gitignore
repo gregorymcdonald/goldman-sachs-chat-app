@@ -1,5 +1,9 @@
 # Backend 
 target
+# Visual Studio Code java Extension
+.classpath
+.project
+.settings
 
 # Frontend
 node_modules
