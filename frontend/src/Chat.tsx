@@ -2,50 +2,51 @@ import * as React from 'react';
 import ChatInput from './ChatInput'
 import ChatMessage from './ChatMessage'
 
-const URL = 'ws://localhost:3030'
+const WebSocketUrl = 'ws://localhost:8080'
 
 interface State {
     name: string,
-    messages: any[],
-    websocket: WebSocket
+    messages: any[]
 }
 
+/**
+ * Class for chat component.
+ */
 export default class Chat extends React.Component<{}, State> {
   public state: State = {
     name: 'Bob',
-    messages: [],
-    websocket: new WebSocket(URL)
+    messages: []
   }
 
-  componentDidMount() {
-    this.state.websocket.onopen = () => {
-      // on connecting, do nothing but log it to the console
-      console.log('connected')
+  private websocket: WebSocket = new WebSocket(WebSocketUrl);
+
+  public componentDidMount(): void {
+    this.websocket.onopen = () => {
+      console.log(`Connected to WebSocket server at ${WebSocketUrl}`);
     }
 
-    this.state.websocket.onmessage = evt => {
-      // on receiving a message, add it to the list of messages
-      const message = JSON.parse(evt.data)
-      this.addMessage(message)
+    this.websocket.onmessage = evt => {
+      // When a message is received, add it to the list of messages.
+      const messages = JSON.parse(evt.data);
+      this.setState(state => ({ messages: messages }));
     }
 
-    this.state.websocket.onclose = () => {
-      console.log('disconnected')
-      // automatically try to reconnect on connection loss
-      this.setState({
-        websocket: new WebSocket(URL),
-      })
+    this.websocket.onclose = () => {
+      console.log(`Disconnected from WebSocket server at ${WebSocketUrl}`);
     }
   }
 
-  addMessage = message =>
-    this.setState(state => ({ messages: [message, ...state.messages] }))
-
-  submitMessage = messageString => {
+  /**
+   * Submit the message entered by the user.
+   * @param message the message text to submit
+   */
+  public submitMessage(message: string): void {
+    if (!message) {
+      return;
+    }
     // on submitting the ChatInput form, send the message, add it to the list and reset the input
-    const message = { name: this.state.name, message: messageString }
-    this.state.websocket.send(JSON.stringify(message))
-    this.addMessage(message)
+    const messageObj = { name: this.state.name, message: message }
+    this.websocket.send(JSON.stringify(messageObj));
   }
 
   render() {
