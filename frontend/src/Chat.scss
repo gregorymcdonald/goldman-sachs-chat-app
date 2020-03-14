@@ -36,8 +36,14 @@ $page-margin: 8px;
         margin-bottom: 4px;
 
         .message {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 14px;
             margin: 2px;
         }
+    }
+
+    textarea.chat-input {
+        font-family: 'Times New Roman', Times, serif;
+        resize: none;
     }
 }

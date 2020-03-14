@@ -16,7 +16,8 @@ export default class ChatInput extends React.Component<Props, State> {
   render() {
     return (
       <textarea
-        style={{ resize: 'none' }}
+        placeholder="Enter your message here..."
+        className="chat-input"
         rows={4}
         value={this.state.message}
         onChange={e => this.setState({ message: e.target.value })}
