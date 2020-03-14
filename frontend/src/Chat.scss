@@ -1,0 +1,43 @@
+$page-margin: 8px;
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    margin: $page-margin;
+    max-height: calc(100% - 2 *  #{$page-margin});
+
+    span.screenname {
+        color: rgb(95, 88, 130); // Color based off of AOL Instant Messenger login screen.
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        font-style: italic;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    input.screenname {
+        margin-bottom: 10px;
+        padding: 2px 4px;
+    }
+
+    // Styles borders like the old Windows bevel.
+    .windows-bevel {
+        border-top: rgb(57, 56, 48) groove 2px;
+        border-left: rgb(113, 111, 101) groove 2px;
+        border-bottom: rgb(252, 245, 225) solid;
+        border-right: rgb(246, 242, 232) solid 1px;
+    }
+
+    .messages-container {
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        margin-bottom: 4px;
+
+        .message {
+            font-size: 14px;
+            margin: 2px;
+        }
+    }
+}

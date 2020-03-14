@@ -2,6 +2,8 @@ import * as React from 'react';
 import ChatInput from './ChatInput'
 import ChatMessage from './ChatMessage'
 
+import './Chat.scss';
+
 const WebSocketUrl = 'ws://localhost:8080'
 
 interface State {
@@ -51,25 +53,28 @@ export default class Chat extends React.Component<{}, State> {
 
   render() {
     return (
-      <div>
-        <label htmlFor="name">
-          Name:&nbsp;
-          <input
-            type="text"
-            id={'name'}
-            placeholder={'Enter your name...'}
-            value={this.state.name}
-            onChange={e => this.setState({ name: e.target.value })}
-          />
-        </label>
+      <div className="chat-container">
+        <span className="screenname">ScreenName</span>
+        <input
+          className="screenname"
+          type="text"
+          placeholder={'Enter your name...'}
+          value={this.state.name}
+          onChange={e => this.setState({ name: e.target.value })}
+        />
+        <div className="messages-container windows-bevel">
+        {
+          this.state.messages.map((message, index) =>
+            <ChatMessage
+              key={index}
+              message={message.message}
+              name={message.name}
+              nameColor={this.state.name === message.name ? 'rgb(1, 1, 255)' : 'rgb(250, 2, 2)'}
+            />,
+          )
+        }
+        </div>
         <ChatInput onSubmitMessage={messageString => this.submitMessage(messageString)} />
-        {this.state.messages.map((message, index) =>
-          <ChatMessage
-            key={index}
-            message={message.message}
-            name={message.name}
-          />,
-        )}
       </div>
     )
   }

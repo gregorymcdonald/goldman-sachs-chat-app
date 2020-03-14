@@ -2,15 +2,19 @@ import * as React from 'react';
 
 interface Props {
     name: string;
+    nameColor?: string;
     message: string;
 }
 
 export default class ChatInput extends React.Component<Props> {
     render() {
         return (
-            <p>
-                <strong>{this.props.name}</strong> <em>{this.props.message}</em>
-            </p>
+            <span className="message">
+                <strong style={{ color: this.props.nameColor || 'black'}}>
+                    {this.props.name}:&nbsp;
+                </strong>
+                <span>{this.props.message}</span>
+            </span>
         )
     }
 }

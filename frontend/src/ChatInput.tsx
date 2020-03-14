@@ -15,22 +15,21 @@ export default class ChatInput extends React.Component<Props, State> {
 
   render() {
     return (
-      <form
-        action="."
-        onSubmit={e => {
-          e.preventDefault()
-          this.props.onSubmitMessage(this.state.message)
-          this.setState({ message: '' })
-        }}
-      >
-        <input
-          type="text"
-          placeholder={'Enter message...'}
-          value={this.state.message}
-          onChange={e => this.setState({ message: e.target.value })}
-        />
-        <input type="submit" value={'Send'} />
-      </form>
+      <textarea
+        style={{ resize: 'none' }}
+        rows={4}
+        value={this.state.message}
+        onChange={e => this.setState({ message: e.target.value })}
+        onKeyPress={
+          (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              this.props.onSubmitMessage(this.state.message);
+              this.setState({ message: '' });
+            }
+          }
+        }
+      />
     )
   }
 }
