@@ -1,14 +1,20 @@
-// This style rule makes the root React div fill the height of the viewport.
-// Without this style rule the root React div's height will be determined by its children.
-html, body, #root, #root > div {
-    height: 100%
-}
-
-// Removes the default 8px margin on the body.
-body {
-    margin: 0;
-}
 
 html {
-    background-color: rgb(235, 229, 217); // Color based off of window color on older versions of Windows.
+    // Color based off of window color on older versions of Windows.
+    background-color: rgb(235, 229, 217);
+    // Makes the root html element fill the pages height.
+    height: 100%;
+}
+
+// This rule makes the body fill the height of the viewport.
+// Without this style rule the body element's height will be determined by its children.
+body {
+    // The body has a margin of 8px by default, so we subtract 2 * 8px (16px)
+    // to get the height to exactly fill the viewport's height.
+    height: calc(100% - 16px);
+}
+
+// This rule makes the root React element (denoted by class "root") fill the available height.
+#root {
+    height: 100%;
 }
